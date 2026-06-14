@@ -309,6 +309,58 @@ const ResetPasswordValidation = async (req,res,next)=>{
         next();
     }
 }
+
+const changePasswordValidation = async (req,res,next) =>{
+    const changePasswordSchema = joi.object({
+        oldPassword:joi.string().required(),
+        newPassword:joi.string().required()
+    })
+
+    const {error} = changePasswordSchema.validate(req.body)
+    if(error){
+        return res.status(200).json({
+            message:"Error in JOI changePasswordValidation Schema",
+            status:200,
+            ok:true,
+            err:error,
+            origin:"changePasswordSchema JOI - Error in Validation"
+        })
+    }
+    try{
+        const decodedToken = jwt.verify(req.cookies.token, JWT_SECRET)
+        const foundUser = await User.findOne({_id:decodedToken._id})
+        
+        if(!foundUser){
+            return res.status(404).json({
+                message:"User Not Found",
+                status:404,
+                ok:false,
+                origin:"changePasswordSchema JOI - Error in Validation"
+            })
+        }
+
+        const isMatch = bcrypt.compare(oldPassword, foundUser.password)
+        if (!isMatch){
+            return res.status(404).json({
+                "message":"Incorrect Password",
+                "status":404,
+                "ok":false,
+                "origin": "changePasswordValidation JOI - Incorrect Password"     
+            })
+        }
+        next()
+
+    }catch(err){
+        return res.status(500).json({
+            message:"Error in Finding User",
+            status:500,
+            ok:false,
+            error:err,
+            origin:"changePasswordValidation JOI - Server Error"
+        })
+    }
+}
+
 // Paths
 
 const authControllerPath = path.join(__dirname, '..', 'controllers', 'authController.js')
@@ -326,11 +378,11 @@ const {
     // userVerifyForgotOTP,
     // userResetPassword,
 
-    // currentUser,
+    currentUser,
 
-    // changePassword,
+    changePassword,
 
-    // userLogout
+    userLogout
 
 } = require(authControllerPath)
 
@@ -359,13 +411,13 @@ router.post('/sign-up/verify-otp', OTPVerificationValidation ,userSignUpVerifyOT
 //Login Routes
 router.post('/login',LoginInValidation, userLogin)
 
-// //Current User
-// router.get('/me', jwtAuthMiddleware, currentUser)
+//Current User
+router.get('/me', jwtAuthMiddleware, currentUser)
 
-// //Change Password
-// router.put('/change-password', jwtAuthMiddleware, changePassword)
+//Change Password
+router.put('/change-password', jwtAuthMiddleware, changePassword)
 
-// //Logout
-// router.post('/logout', jwtAuthMiddleware, userLogout)
+//Logout
+router.post('/logout', jwtAuthMiddleware, userLogout)
 
 module.exports = router

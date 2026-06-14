@@ -246,9 +246,72 @@ const userLogin = async (req,res) =>{
     }
 }
 
+const userLogout = async (req,res) =>{
+    res.clearCookie('token');
+    res.status(200).json({
+        message:"Logout Successfully",
+        status:200,
+        ok:true
+    })
+}
+
+const currentUser = async (req,res) =>{
+    try{
+        const currUser = jwt.verify(req.cookies.token)
+        res.status(200).json({
+            message:"Current User Extracted",
+            status:200,
+            ok:true,
+            token:req.cookies.token,
+            currUser:currUser   
+        })
+    }catch(err){
+        res.status(500).json({
+            message:"Tokenisation Unsuccessfull",
+            status:500,
+            ok:true,
+            token:req.cookies.token,
+            error:err,
+            origin:"Current User - Tokenisation Error"
+        })
+    }
+    
+}
+
+const changePassword = async (req,res) =>{
+    const {oldPassword, newPassword} = req.body
+    const decodedToken = jwt.verify(decodedToken, JWT_SECRET)
+    try{
+        const foundUser = await User.findOne({_id:decodedToken._id})
+        const hashedPassword = bcrypt.hash(newPassword, SALT_ROUNDS)
+        foundUser.password = hashedPassword
+        await foundUser.save()
+        return res.status(200).json({
+            message:"Password Changed Successfully",
+            status:200,
+            ok:true,
+            origin:"changePassword Controller"
+        })
+    }catch(err){
+        return res.status(500).json({
+            message:"Server Error",
+            status:500,
+            ok:false,
+            error:err,
+            origin:"changePassword Controller"
+        })
+    }
+}
+
+
+
+
 module.exports = {
     userSignUp,
     userSignUpSendOTP,
     userSignUpVerifyOTP,
-    userLogin
+    userLogin,
+    userLogout,
+    currentUser,
+    changePassword
 }
