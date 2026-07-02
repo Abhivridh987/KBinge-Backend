@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const MovieSchema = mongoose.Schema(
 {
-    "Unnamed :0": {
+    "Unnamed: 0": {
         type: Number
     },
     "Name":{
@@ -71,6 +71,11 @@ const MovieSchema = mongoose.Schema(
     "Episode": {
         type: String,
         trim: true
+    },
+
+    "topPicks":{
+        type:Boolean,
+        default:false
     }
 },
 {

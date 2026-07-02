@@ -5,7 +5,7 @@ const path = require('path')
 const router = express.Router()
 const joi = require('joi')
 const mongoose = require('mongoose')
-
+const upload = require('../config/multer_config')
 //envs
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'
@@ -15,7 +15,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'
 const User = require('../models/user.model')
 const OTP = require('../models/otp.model')
 
-//Middleware
+
+// Middlewares
+const imgStaticMiddleware = express.static(path.join(__dirname, '../public/images/uploads'))
+router.use('/upload', imgStaticMiddleware)
 
 //JWT
 
@@ -273,25 +276,45 @@ const ResetPasswordValidation = async (req,res,next)=>{
             return res.status(404).json({
                 "message":"JOI: OTP Session Doesnt Exists",
                 "status":404,
-                "ok":false
+                "ok":false,
+                "origin":"ResetPasswordValidation - OTP Not Session"
             })
         }
 
-        if (foundOTP.isValid() == false)
+        if (foundOTP.isUsed !== true)
         {
             return res.status(404).json({
-                "message":"JOI: OTP Session Not Valid",
+                "message":"JOI: OTP Session Not Verified",
                 "status":404,
-                "ok":false
+                "ok":false,
+                "origin":"ResetPasswordValidation - OTP Not Verified"
             })
         }
-
+        if(new Date() > foundOTP.expiresAt)
+        {
+            return res.status(400).json({
+                "message":"JOI: OTP Session Expired",
+                "status":404,
+                "ok":false,
+                "origin":"ResetPasswordValidation JOI - OTP Expired"
+            })
+        }
+        if(foundOTP.purpose !== "forgot-password")
+        {
+            return res.status(400).json({
+                "message":"JOI: OTP Session Purpose Error",
+                "status":404,
+                "ok":false,
+                "origin":"ResetPasswordValidation JOI - OTP Purpose Error"
+            })
+        }
         if (req.body.email != foundOTP.email)
         {
             return res.status(404).json({
                 "message":"JOI: OTP Email doesnt verify user email",
                 "status":404,
-                "ok":false
+                "ok":false,
+                "origin":"ResetPasswordValidation - Email Mismatch"
             })
         }
         
@@ -301,7 +324,8 @@ const ResetPasswordValidation = async (req,res,next)=>{
             return res.status(404).json({
                 "message":"JOI: User with this email Doesnt Exists",
                 "status":404,
-                "ok":false
+                "ok":false,
+                "origin":"ResetPaswordValidation "
             })
         }
 
@@ -318,10 +342,10 @@ const changePasswordValidation = async (req,res,next) =>{
 
     const {error} = changePasswordSchema.validate(req.body)
     if(error){
-        return res.status(200).json({
+        return res.status(400).json({
             message:"Error in JOI changePasswordValidation Schema",
             status:200,
-            ok:true,
+            ok:false,
             err:error,
             origin:"changePasswordSchema JOI - Error in Validation"
         })
@@ -339,7 +363,7 @@ const changePasswordValidation = async (req,res,next) =>{
             })
         }
 
-        const isMatch = bcrypt.compare(oldPassword, foundUser.password)
+        const isMatch = await bcrypt.compare(req.body.oldPassword, foundUser.password)
         if (!isMatch){
             return res.status(404).json({
                 "message":"Incorrect Password",
@@ -374,15 +398,21 @@ const {
 
     userLogin,
 
-    // userSendForgotOTP,
-    // userVerifyForgotOTP,
-    // userResetPassword,
+    userForgotSendOTP,
+    userForgotVerifyOTP,
+    userResetPassword,
 
     currentUser,
 
     changePassword,
 
-    userLogout
+    userLogout,
+
+    userProfilePicUpload,
+
+    userProfilePicDelete,
+
+    showProfilePic
 
 } = require(authControllerPath)
 
@@ -403,10 +433,10 @@ router.post('/sign-up/send-otp', OTPSendingValidation, userSignUpSendOTP)
 router.post('/sign-up/verify-otp', OTPVerificationValidation ,userSignUpVerifyOTP)
 
 
-// //Forgot Password Routes
-// router.post('/forgot-password/send-otp', OTPSendingValidation, userSendForgotOTP);
-// router.post('/forgot-password/verify-otp', OTPVerificationValidation,userVerifyForgotOTP);
-// router.put('/forgot-password/reset',ResetPasswordValidation , userResetPassword);
+//Forgot Password Routes
+router.post('/forgot-password/send-otp', OTPSendingValidation, userForgotSendOTP);
+router.post('/forgot-password/verify-otp', OTPVerificationValidation,userForgotVerifyOTP);
+router.put('/forgot-password/reset',ResetPasswordValidation , userResetPassword);
 
 //Login Routes
 router.post('/login',LoginInValidation, userLogin)
@@ -415,9 +445,20 @@ router.post('/login',LoginInValidation, userLogin)
 router.get('/me', jwtAuthMiddleware, currentUser)
 
 //Change Password
-router.put('/change-password', jwtAuthMiddleware, changePassword)
+router.put('/change-password', jwtAuthMiddleware, changePasswordValidation, changePassword)
 
 //Logout
 router.post('/logout', jwtAuthMiddleware, userLogout)
+
+//Change Profile Pic
+router.post('/change-profile-pic', jwtAuthMiddleware, upload.single('profilePic'), userProfilePicUpload)
+
+// Delete Profile Pic
+
+router.delete('/delete-profile-pic', jwtAuthMiddleware, userProfilePicDelete)
+
+//Show Profile Pic
+
+router.get('/show-profile-pic', jwtAuthMiddleware, showProfilePic)
 
 module.exports = router

@@ -34,7 +34,11 @@ const UserSchema = mongoose.Schema({
                 ref:'Movie'
                 
             }
-        ]
+        ],
+        profilePic:{
+            type:String,
+            default:"default.webp"
+        }
     },
     {
         timestamps:true
