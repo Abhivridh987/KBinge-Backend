@@ -142,7 +142,8 @@ app.use('/home', jwtAuthMiddleware, movieRouter)
 const adminRouter = require(adminRouterPath)
 app.use('/admin', jwtAuthAdminMiddleware, adminRouter)
 
-
+const commentRouter = require(path.join(__dirname, 'routes', 'commentRouter.js'))
+app.use('/comments', jwtAuthMiddleware, commentRouter)
 
 app.get('/', (req,res)=>{
     return res.status(200).json({
