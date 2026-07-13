@@ -273,7 +273,15 @@ const userLogout = async (req,res) =>{
 
 const currentUser = async (req,res) =>{
     try{
-        const currUser = jwt.verify(req.cookies.token, JWT_SECRET)
+        const decodedToken = jwt.verify(req.cookies.token, JWT_SECRET)
+        const currUser = await User.findById(decodedToken._id).select('-password')
+        if (!currUser) {
+            return res.status(404).json({
+                message: "User not found",
+                status: 404,
+                ok: false
+            });
+        }
         res.status(200).json({
             message:"Current User Extracted",
             status:200,
@@ -285,7 +293,7 @@ const currentUser = async (req,res) =>{
         res.status(500).json({
             message:"Tokenisation Unsuccessfull",
             status:500,
-            ok:true,
+            ok:false,
             token:req.cookies.token,
             error:err,
             origin:"Current User - Tokenisation Error"
@@ -565,31 +573,114 @@ const showProfilePic = async (req,res) =>{
     try{
         const decodedToken = jwt.verify(req.cookies.token, JWT_SECRET)
         const foundUser = await User.findOne({_id:decodedToken._id})
-        return res.send(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Profile Pic</title>
-            </head>
+        // return res.send(`
+        //     <!DOCTYPE html>
+        //     <html>
+        //     <head>
+        //         <title>Profile Pic</title>
+        //     </head>
 
-            <body>
-                <h1>Profile Picture</h1>
+        //     <body>
+        //         <h1>Profile Picture</h1>
 
-                <img
-                    src="upload/${foundUser.profilePic}"
-                    width="300"
-                />
-            </body>
+        //         <img
+        //             src="upload/${foundUser.profilePic}"
+        //             width="300"
+        //         />
+        //     </body>
 
-            </html>
-        `)
+        //     </html>
+        // `)
+        return res.status(200).json({
+            message:"Profile Pic Successfully Fetched",
+            status:200,
+            ok:true,
+            profilePic:`upload/${foundUser.profilePic}`,
+            origin:"showProfilePic Controller"
+        })
     }catch(err){
         res.status(500).json({
             ok:false,
-            status:500
+            status:500,
+            error:err,
+            origin:"showProfilePic Controller"
+            
         })
     }
 }
+
+const addWatchList = async (req,res) =>{
+    const {movieId} = req.body
+    try{
+        const decodedToken = jwt.verify(req.cookies.token, JWT_SECRET)
+        const foundUser = await User.findOne({_id:decodedToken._id})
+        if(!foundUser.favorites.includes(movieId)){
+            foundUser.favorites.push(movieId)
+        }
+        await foundUser.save()
+        res.status(200).json({
+            message:"Movie added to watchlist",
+            status:200,
+            ok:true,
+            origin:"addWatchList Controller"
+        })
+    }catch(err){
+        res.status(500).json({
+            message:"Server Error",
+            status:500,
+            ok:false,
+            error:err,
+            origin:"addWatchList Controller"
+        })
+    }
+}
+
+const removeWatchList = async (req,res) =>{
+    const {movieId} = req.body
+    try{
+        const decodedToken = jwt.verify(req.cookies.token, JWT_SECRET)
+        const foundUser = await User.findOne({_id:decodedToken._id})
+        foundUser.favorites = foundUser.favorites.filter(id => id !== movieId)
+        await foundUser.save()
+        res.status(200).json({
+            message:"Movie removed from watchlist",
+            status:200,
+            ok:true,
+            origin:"removeWatchList Controller"
+        })
+    }catch(err){
+        res.status(500).json({
+            message:"Server Error",
+            status:500,
+            ok:false,
+            error:err,
+            origin:"removeWatchList Controller"
+        })
+    }
+}
+
+const getWatchList = async (req,res) =>{
+    try{
+        const decodedToken = jwt.verify(req.cookies.token, JWT_SECRET)
+        const foundUser = await User.findOne({_id:decodedToken._id})
+        res.status(200).json({
+            message:"Watchlist fetched successfully",
+            status:200,
+            ok:true,
+            watchlist:foundUser.favorites,
+            origin:"getWatchList Controller"
+        })
+    }catch(err){
+        res.status(500).json({
+            message:"Server Error",
+            status:500,
+            ok:false,
+            error:err,
+            origin:"getWatchList Controller"
+        })
+    }
+}
+
 module.exports = {
     userSignUp,
     userSignUpSendOTP,
@@ -603,5 +694,8 @@ module.exports = {
     userResetPassword,
     userProfilePicUpload,
     userProfilePicDelete,
-    showProfilePic
+    showProfilePic,
+    addWatchList,
+    removeWatchList,
+    getWatchList
 }

@@ -110,6 +110,23 @@ module.exports = {
       newPassword: { type: 'string', example: 'newPassword123' }
     }
   },
+  WatchlistRequest: {
+    type: 'object',
+    required: ['movieId'],
+    properties: {
+      movieId: { type: 'string', example: '64d0f1d3a4b4c7c0e9f8a123' }
+    }
+  },
+  WatchlistResponse: {
+    type: 'object',
+    properties: {
+      message: { type: 'string', example: 'Watchlist fetched successfully' },
+      status: { type: 'integer', example: 200 },
+      ok: { type: 'boolean', example: true },
+      watchlist: { type: 'array', items: { type: 'string' }, example: ['64d0f1d3a4b4c7c0e9f8a123'] },
+      origin: { type: 'string', nullable: true, example: 'getWatchList Controller' }
+    }
+  },
   AddMovieRequest: {
     type: 'object',
     required: ['Name', 'Year', 'Score'],

@@ -245,5 +245,78 @@ module.exports = {
         401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
       }
     }
+  },
+  '/auth/add-to-watchlist': {
+    post: {
+      tags: ['Auth'],
+      summary: 'Add a movie to the current user watchlist',
+      security: [{ cookieAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: { $ref: '#/components/schemas/WatchlistRequest' }
+          }
+        }
+      },
+      responses: {
+        200: {
+          description: 'Movie added to watchlist',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/SuccessResponse' }
+            }
+          }
+        },
+        401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+        500: { description: 'Server error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+      }
+    }
+  },
+  '/auth/remove-from-watchlist': {
+    delete: {
+      tags: ['Auth'],
+      summary: 'Remove a movie from the current user watchlist',
+      security: [{ cookieAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: { $ref: '#/components/schemas/WatchlistRequest' }
+          }
+        }
+      },
+      responses: {
+        200: {
+          description: 'Movie removed from watchlist',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/SuccessResponse' }
+            }
+          }
+        },
+        401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+        500: { description: 'Server error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+      }
+    }
+  },
+  '/auth/watchlist': {
+    get: {
+      tags: ['Auth'],
+      summary: 'Get the current user watchlist',
+      security: [{ cookieAuth: [] }],
+      responses: {
+        200: {
+          description: 'Watchlist fetched successfully',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/WatchlistResponse' }
+            }
+          }
+        },
+        401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+        500: { description: 'Server error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+      }
+    }
   }
 };

@@ -412,7 +412,13 @@ const {
 
     userProfilePicDelete,
 
-    showProfilePic
+    showProfilePic,     
+
+    addWatchList,
+
+    removeWatchList,
+
+    getWatchList
 
 } = require(authControllerPath)
 
@@ -461,6 +467,14 @@ router.delete('/delete-profile-pic', jwtAuthMiddleware, userProfilePicDelete)
 
 router.get('/show-profile-pic', jwtAuthMiddleware, showProfilePic)
 
+// Add to Watchlist
+router.post('/add-to-watchlist', jwtAuthMiddleware, addWatchList)
+
+// Remove from Watchlist
+router.delete('/remove-from-watchlist', jwtAuthMiddleware, removeWatchList)
+
+// Get Watchlist
+router.get('/watchlist', jwtAuthMiddleware, getWatchList)
 
 
 module.exports = router
