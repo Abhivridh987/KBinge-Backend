@@ -1,5 +1,12 @@
 // Imports
 
+
+//Access Environment Variables
+require('dotenv').config()
+const PORT= Number(process.env.PORT) || 5050
+const MONGO_URI=process.env.MONGO_URI
+const JWT_SECRET=process.env.JWT_SECRET
+
 //Basic Imports
 const os = require('os')
 const fs = require('fs')
@@ -22,12 +29,8 @@ const swaggerSpec = require('./swagger/swagger')
 // Database Imports
 const mongoose = require('mongoose')
 
-//Access Environment Variables
-require('dotenv').config()
 
-const PORT= Number(process.env.PORT) || 5050
-const MONGO_URI=process.env.MONGO_URI
-const JWT_SECRET=process.env.JWT_SECRET
+
 // Paths
 
 const authRouterPath = path.join(__dirname, 'routes', 'authRouter.js')
@@ -155,8 +158,7 @@ app.get('/', (req,res)=>{
 })
 
 //API Documentation
-
-
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 // Setting the Server
 
