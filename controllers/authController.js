@@ -614,7 +614,7 @@ const addWatchList = async (req,res) =>{
     try{
         const decodedToken = jwt.verify(req.cookies.token, JWT_SECRET)
         const foundUser = await User.findOne({_id:decodedToken._id})
-        if(!foundUser.favorites.includes(movieId)){
+        if(!foundUser.favorites.some(id => id.toString() === movieId)){
             foundUser.favorites.push(movieId)
         }
         await foundUser.save()
@@ -640,7 +640,7 @@ const removeWatchList = async (req,res) =>{
     try{
         const decodedToken = jwt.verify(req.cookies.token, JWT_SECRET)
         const foundUser = await User.findOne({_id:decodedToken._id})
-        foundUser.favorites = foundUser.favorites.filter(id => id !== movieId)
+        foundUser.favorites = foundUser.favorites.filter(id => id.toString() !== movieId)
         await foundUser.save()
         res.status(200).json({
             message:"Movie removed from watchlist",
