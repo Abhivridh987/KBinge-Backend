@@ -12,7 +12,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: `http://localhost:${PORT}`,
+      url: `https://kbinge-backend.onrender.com`,
       description: 'Local server'
     }
   ],
