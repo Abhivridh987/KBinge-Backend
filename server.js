@@ -29,8 +29,6 @@ const swaggerSpec = require('./swagger/swagger')
 // Database Imports
 const mongoose = require('mongoose')
 
-
-
 // Paths
 
 const authRouterPath = path.join(__dirname, 'routes', 'authRouter.js')
