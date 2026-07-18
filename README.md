@@ -13,7 +13,7 @@ A robust and scalable RESTful backend service for the KBinge platform. This API 
 [![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)](https://jwt.io/)
 [![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=Cloudinary&logoColor=white)](https://cloudinary.com/)
 [![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)](https://swagger.io/)
-[![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-C51A4A?style=for-the-badge&logo=raspberrypi&logoColor=white)](https://www.raspberrypi.com/)
+[![Nodemailer](https://img.shields.io/badge/Nodemailer-009639?style=for-the-badge&logo=maildotru&logoColor=white)](https://nodemailer.com/)
 
 ## ✨ Key Features
 
@@ -67,6 +67,9 @@ KBinge-Backend/
    PORT=3000
    MONGO_URI=your_mongodb_connection_string
    JWT_SECRET=your_jwt_secret_key
+   SALT_ROUNDS=20
+   EMAIL_USER="example@email.com"
+   EMAIL_PASS="xxxx xxxx xxxx xxxx"
    CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
    CLOUDINARY_API_KEY=your_cloudinary_api_key
    CLOUDINARY_API_SECRET=your_cloudinary_api_secret
