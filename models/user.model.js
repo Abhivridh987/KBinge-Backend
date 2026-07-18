@@ -1,47 +1,47 @@
 const mongoose = require('mongoose')
 
 const UserSchema = mongoose.Schema({
-        username:{
-            type:String,
-            required:[true, "Username Required"],
-            trim:true,
-            match:[/^[a-zA-Z0-9_]{3,20}$/,"Invlaid Syntax for UserName"]
-        },
-        email:{
-            type:String,
-            required:[true, "Email Required"],
-            trim:true,
-            unique:true,
-            match: [/^\S+@\S+\.\S+$/, "Invalid email"]
-        },
-        password:{
-            type:String,
-            required:[true, "Password Required"],
-            trim:true,
-            minLength:[1, "Password should be atleast 1 character long"]
-        },
-        admin:{
-            type:Boolean,
-            default:false
-        },
-        DOB:{
-            type:Date,
-            required:[true, "DOB Required"]
-        },
-        favorites:[
-            {
-                type:mongoose.Schema.Types.ObjectId,
-                ref:'Movie'
-                
-            }
-        ],
-        profilePic:{
-            type:String,
-            default:"default.webp"
-        }
+    username: {
+        type: String,
+        required: [true, "Username Required"],
+        trim: true,
+        match: [/^[a-zA-Z0-9_]{3,20}$/, "Invlaid Syntax for UserName"]
     },
+    email: {
+        type: String,
+        required: [true, "Email Required"],
+        trim: true,
+        unique: true,
+        match: [/^\S+@\S+\.\S+$/, "Invalid email"]
+    },
+    password: {
+        type: String,
+        required: [true, "Password Required"],
+        trim: true,
+        minLength: [1, "Password should be atleast 1 character long"]
+    },
+    admin: {
+        type: Boolean,
+        default: false
+    },
+    DOB: {
+        type: Date,
+        required: [true, "DOB Required"]
+    },
+    favorites: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Movie'
+
+        }
+    ],
+    profilePic: {
+        type: String,
+        default: "https://res.cloudinary.com/rtfmu2pg/image/upload/v1784374987/default_hqb1tc.webp"
+    }
+},
     {
-        timestamps:true
+        timestamps: true
     }
 )
 

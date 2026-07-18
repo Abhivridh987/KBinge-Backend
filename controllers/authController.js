@@ -580,17 +580,12 @@ const showProfilePic = async (req,res) =>{
     try{
         const decodedToken = jwt.verify(req.cookies.token, JWT_SECRET)
         const foundUser = await User.findOne({_id:decodedToken._id})
-        
-        let picUrl = foundUser.profilePic;
-        if (!picUrl.startsWith("http")) {
-            picUrl = `upload/${picUrl}`;
-        }
 
         return res.status(200).json({
             message:"Profile Pic Successfully Fetched",
             status:200,
             ok:true,
-            profilePic: picUrl,
+            profilePic: foundUser.profilePic,
             origin:"showProfilePic Controller"
         })
     }catch(err){
