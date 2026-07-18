@@ -124,7 +124,11 @@ const logData = (req,res,next) =>{
 
 
 
-app.use(cors())
+app.use(cors({
+    origin: true,
+    credentials: true
+}))
+
 app.use(express.json())
 app.use(cookieParser())
 app.use(logData)
