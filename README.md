@@ -3,7 +3,7 @@
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000)
 ![License: ISC](https://img.shields.io/badge/License-ISC-yellow.svg)
 
-A robust and scalable RESTful backend service for the KBinge platform, providing secure authentication, cloud media management, and comprehensive API endpoints.
+A robust and scalable RESTful backend service for the KBinge platform. This API powers the core functionality of the application, providing secure user authentication (signup, login, and session management), exploring and fetching an extensive catalog of dramas, searching for specific titles, and managing user profiles. Built with performance in mind, it leverages cloud media management for efficient image handling and provides comprehensive endpoints to ensure a seamless client-side experience.
 
 ## 🚀 Tech Stack
 
