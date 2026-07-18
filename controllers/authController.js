@@ -239,8 +239,11 @@ const userLogin = async (req,res) =>{
         }, JWT_SECRET, {expiresIn:'1d'});
 
         res.cookie("token", token, {
-            httpOnly:true,
+            httpOnly: true,
             maxAge: 1 * 24 * 60 * 60 * 1000,
+            sameSite: 'none',
+            secure: true,
+            path: '/'
         });
         const decodedToken = jwt.verify(token, JWT_SECRET)
 
@@ -263,7 +266,11 @@ const userLogin = async (req,res) =>{
 }
 
 const userLogout = async (req,res) =>{
-    res.clearCookie('token');
+    res.clearCookie('token', {
+        path: '/',
+        sameSite: 'none',
+        secure: true
+    });
     res.status(200).json({
         message:"Logout Successfully",
         status:200,
