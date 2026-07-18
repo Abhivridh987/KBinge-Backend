@@ -17,7 +17,6 @@ const OTP = require('../models/otp.model')
 
 
 //JWT
-
 const jwtAuthMiddleware = (req, res, next) => {
     if (req.cookies && req.cookies.token) {
         const token = req.cookies.token;
