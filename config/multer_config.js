@@ -1,59 +1,29 @@
-const path = require("path")
 const multer = require("multer")
-const jwt = require("jsonwebtoken")
-const fs = require("fs")
+const cloudinary = require("cloudinary").v2
+const { CloudinaryStorage } = require("multer-storage-cloudinary")
 
-const uploadPath = path.join(
-    __dirname,
-    "../public/images/uploads"
-)
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
-if (!fs.existsSync(uploadPath)) {
-    fs.mkdirSync(uploadPath, { recursive: true })
-}
-
-const storage = multer.diskStorage({
-
-    destination: (req, file, cb) => {
-        cb(null, uploadPath)
-    },
-
-    filename: (req, file, cb) => {
-        try {
-            const token = req.cookies.token
-            const decoded = jwt.verify(token,process.env.JWT_SECRET)
-            const filename = `${Date.now()}-${decoded._id}${path.extname(file.originalname)}`
-            cb(null, filename)
-        } catch (err) {
-            cb(new Error("Invalid authentication token"))
-        }
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "kbinge_profiles",
+    allowed_formats: ["jpg", "png", "jpeg", "webp"],
+    public_id: (req, file) => {
+      // Use user's ID as filename to automatically overwrite old profile pics
+      // req.user is set by jwtAuthMiddleware before this middleware
+      if (req.user && req.user._id) {
+        return `${req.user._id}`;
+      }
+      return `${Date.now()}`;
     }
-})
+  },
+});
 
-// const fileFilter = (req,file,cb) => {
+const upload = multer({ storage: storage });
 
-//     const allowed = [
-//         "image/jpeg",
-//         "image/png",
-//         "image/webp",
-//         "image/jpg"
-//     ]
-//     if (allowed.includes(file.mimetype))
-//     {
-//         cb(null, true)
-//     }
-//     else {
-//         cb(new Error("Only images allowed"),false)
-//     }
-//}
-
-const upload = multer({
-    storage
-    // fileFilter,
-    // limits: {
-    //     fileSize:
-    //     5 * 1024 * 1024
-    // }
-})
-
-module.exports = upload
+module.exports = upload;

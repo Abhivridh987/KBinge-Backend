@@ -533,7 +533,7 @@ const userProfilePicUpload = async (req,res)=>{
     try{
         const decodedToken = jwt.verify(req.cookies.token, JWT_SECRET) 
         const foundUser = await User.findOne({_id:decodedToken._id})
-        foundUser.profilePic = req.file.filename
+        foundUser.profilePic = req.file.path
         await foundUser.save()
         res.status(200).json({
             "message":"Profile Pic Successfully Uploaded",
@@ -580,29 +580,17 @@ const showProfilePic = async (req,res) =>{
     try{
         const decodedToken = jwt.verify(req.cookies.token, JWT_SECRET)
         const foundUser = await User.findOne({_id:decodedToken._id})
-        // return res.send(`
-        //     <!DOCTYPE html>
-        //     <html>
-        //     <head>
-        //         <title>Profile Pic</title>
-        //     </head>
+        
+        let picUrl = foundUser.profilePic;
+        if (!picUrl.startsWith("http")) {
+            picUrl = `upload/${picUrl}`;
+        }
 
-        //     <body>
-        //         <h1>Profile Picture</h1>
-
-        //         <img
-        //             src="upload/${foundUser.profilePic}"
-        //             width="300"
-        //         />
-        //     </body>
-
-        //     </html>
-        // `)
         return res.status(200).json({
             message:"Profile Pic Successfully Fetched",
             status:200,
             ok:true,
-            profilePic:`upload/${foundUser.profilePic}`,
+            profilePic: picUrl,
             origin:"showProfilePic Controller"
         })
     }catch(err){
